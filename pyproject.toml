@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "GuilhermeSchreiber7", email = "guilhermeschreieber2007@gmail.com"},
 ]
-dependencies = ["django>=5.2.1", "djangorestframework>=3.16.0"]
+dependencies = ["django>=5.2.2", "djangorestframework>=3.16.0"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
@@ -17,3 +17,20 @@ build-backend = "pdm.backend"
 
 [tool.pdm]
 distribution = true
+
+[tool.pdm.scripts]
+pre_dev = "python ./scripts/set_my_ip.py"
+dev = "python manage.py runserver 0.0.0.0:19003"
+createsuperuser = "python manage.py createsuperuser"
+pre_migrate = "python manage.py makemigrations"
+migrate = "python manage.py migrate"
+post_migrate = "python manage.py graph_models -S -g -o core.png core"
+shell = "python manage.py shell"
+shellp = "python manage.py shell_plus"
+test = "python manage.py test"
+loaddata = "python manage.py loaddata core.json"
+dumpdata = "python manage.py dumpdata --indent 2"
+cria_api = "python ./scripts/cria_api.py {args}"
+check = "ruff check"
+pre_format = "ruff check --fix"
+format = "ruff format"
