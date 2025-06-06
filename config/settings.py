@@ -42,6 +42,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Application definition
 
+# em settings.py
+
+
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -50,7 +55,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    "artelie"
+    'artelie',
 ]
 
 MIDDLEWARE = [
@@ -134,3 +139,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'artelie.User'
+
