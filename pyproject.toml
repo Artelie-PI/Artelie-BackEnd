@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "GuilhermeSchreiber7", email = "guilhermeschreieber2007@gmail.com"},
 ]
-dependencies = ["djangorestframework>=3.16.0", "django>=5.2.2", "netifaces>=0.11.0", "python-dotenv>=1.1.0"]
+dependencies = ["djangorestframework>=3.16.0", "django>=5.2.3", "netifaces>=0.11.0", "python-dotenv>=1.1.0", "graphviz>=0.20.3", "django-extensions>=4.1", "pydotplus>=2.0.2", "djangorestframework-simplejwt>=5.5.0", "dj-database-url>=3.0.0", "psycopg2-binary>=2.9.10", "uvicorn>=0.34.3", "gunicorn>=23.0.0", "whitenoise>=6.9.0"]
 requires-python = ">=3.12"
 readme = "README.md"
 license = {text = "MIT"}
@@ -24,13 +24,17 @@ dev = "python manage.py runserver 0.0.0.0:19003"
 createsuperuser = "python manage.py createsuperuser"
 pre_migrate = "python manage.py makemigrations"
 migrate = "python manage.py migrate"
-post_migrate = "python manage.py graph_models -S -g -o core.png core"
+post_migrate = "python manage.py graph_models -S -g -o artelie.png artelie"
 shell = "python manage.py shell"
 shellp = "python manage.py shell_plus"
 test = "python manage.py test"
-loaddata = "python manage.py loaddata core.json"
+loaddata = "python manage.py loaddata artelie.json"
 dumpdata = "python manage.py dumpdata --indent 2"
 cria_api = "python ./scripts/cria_api.py {args}"
 check = "ruff check"
 pre_format = "ruff check --fix"
 format = "ruff format"
+
+[[tool.pdm.autoexport]]
+filename = "requirements.txt"
+without-hashes = "true"
