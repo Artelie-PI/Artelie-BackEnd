@@ -4,3 +4,5 @@
 # from .user import User
 # from .product import Product
 from .brand import Brand
+from .category import Category
+from .user import User
