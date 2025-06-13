@@ -22,6 +22,8 @@ MODE = os.getenv("MODE")
 SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = os.getenv("DEBUG", "False")
 CSRF_TRUSTED_ORIGINS = ["http://localhost:3000", "http://localhost:8000", "https://*.fl0.io/"]
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost").split(",")
+
 
 if MODE in ["PRODUCTION", "MIGRATE"]:
     MEDIA_URL = '/media/'
