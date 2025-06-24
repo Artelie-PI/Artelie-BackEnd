@@ -6,6 +6,7 @@ click==8.2.1
 colorama==0.4.6; platform_system == "Windows"
 dj-database-url==3.0.0
 django==5.2.3
+django-cors-headers==4.7.0
 django-extensions==4.1
 djangorestframework==3.16.0
 djangorestframework-simplejwt==5.5.0
