@@ -433,6 +433,14 @@
 },
 {
   "model": "sessions.session",
+  "pk": "l6ql77bmet40tgfhhte1c03bd85jv6ma",
+  "fields": {
+    "session_data": ".eJxVjEEOwiAQRe_C2hA6QBWX7j0DmWEGqRpISrsy3l2bdKHb_977LxVxXUpcu8xxYnVWXh1-N8L0kLoBvmO9NZ1aXeaJ9KbonXZ9bSzPy-7-HRTs5VvbMHpgTJBtBjIMXoB9JofG4ymMYjh7ti5RCESMdkDKJoMcEdJgnXp_AACvONo:1upWzM:_7zb8b0kqGjgGXBVoBCTNSkjMmbGMcyRvP-oHrBy7xw",
+    "expire_date": "2025-09-05T18:59:48.225Z"
+  }
+},
+{
+  "model": "sessions.session",
   "pk": "rnub1wm5wbictwl3f2x7f7kwtql9yvmx",
   "fields": {
     "session_data": ".eJxVjDsOwjAQBe_iGlm7_sWmpOcM1vqHA8iW4qRC3B0ipYD2zcx7MU_bWv028uLnxM4M2el3CxQfue0g3andOo-9rcsc-K7wgw5-7Sk_L4f7d1Bp1G_tDKRJO6FIFmkdIEkbkSIFDMoQ2mSDAjk5p4UWJiCQRF2MpiIICrD3B78fNvg:1uPWGA:XrCTlYYJA16j3oEdZIxzyt77w1v6QPUKR_716xobPAY",
@@ -462,7 +470,6 @@
   "model": "artelie.user",
   "pk": 1,
   "fields": {
-    "password": "pbkdf2_sha256$1000000$TPdrSIdaKydUDIkKGwaQ0s$WEg70wW3lu7PiCZiMqQBSfR114h+HDPXJGjYMShrxoA=",
     "last_login": "2025-06-12T00:57:38.974Z",
     "is_superuser": true,
     "username": "admin",
@@ -471,9 +478,78 @@
     "created_at": "2025-06-10T11:28:30.358Z",
     "is_active": true,
     "is_staff": true,
+    "password": "pbkdf2_sha256$1000000$TPdrSIdaKydUDIkKGwaQ0s$WEg70wW3lu7PiCZiMqQBSfR114h+HDPXJGjYMShrxoA=",
     "groups": [
       1
     ],
+    "user_permissions": []
+  }
+},
+{
+  "model": "artelie.user",
+  "pk": 2,
+  "fields": {
+    "last_login": null,
+    "is_superuser": false,
+    "username": "ze",
+    "email": "p@p.com",
+    "full_name": "aaaaaaaaaa",
+    "created_at": "2025-08-22T17:23:23.806Z",
+    "is_active": true,
+    "is_staff": true,
+    "password": "",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "artelie.user",
+  "pk": 3,
+  "fields": {
+    "last_login": null,
+    "is_superuser": true,
+    "username": "superuser",
+    "email": "super@user.com",
+    "full_name": "",
+    "created_at": "2025-08-22T18:06:36.578Z",
+    "is_active": true,
+    "is_staff": true,
+    "password": "pbkdf2_sha256$1000000$JsSItLNuSgnFEiFiZVoPjQ$bNeQXSk+GDyNZbVNWr5L1TMWLyZanHOTFPPFro/btug=",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "artelie.user",
+  "pk": 4,
+  "fields": {
+    "last_login": null,
+    "is_superuser": false,
+    "username": "novo_usuario",
+    "email": "novo_usuario@email.com",
+    "full_name": "Nome Completo",
+    "created_at": "2025-08-22T18:08:03.140Z",
+    "is_active": true,
+    "is_staff": false,
+    "password": "pbkdf2_sha256$1000000$5PqOZg9Fkp3K9yr02X5iJU$+T+oawkVj1qcAoU8WbIWdcSQP5uKbdOYZNTx2qnfVIw=",
+    "groups": [],
+    "user_permissions": []
+  }
+},
+{
+  "model": "artelie.user",
+  "pk": 5,
+  "fields": {
+    "last_login": "2025-08-22T18:59:48.190Z",
+    "is_superuser": true,
+    "username": "adm",
+    "email": "admin@admin.com",
+    "full_name": "",
+    "created_at": "2025-08-22T18:59:27.258Z",
+    "is_active": true,
+    "is_staff": true,
+    "password": "pbkdf2_sha256$1000000$ZIHZoLge9eTg2KEt004pCl$vR7CX1i/a3PmCZXdpp4kd8ZPFN3i4pLf2OxbdR3MyEk=",
+    "groups": [],
     "user_permissions": []
   }
 }
