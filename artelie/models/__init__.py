@@ -6,3 +6,5 @@
 from .brand import Brand
 from .category import Category
 from .user import User
+from .address import Address
+from .supplier import Supplier
