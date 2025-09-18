@@ -8,3 +8,5 @@ from .category import Category
 from .user import User
 from .address import Address
 from .supplier import Supplier
+from .product import Product
+from .order import Order, OrderItem
