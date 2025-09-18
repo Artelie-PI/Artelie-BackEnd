@@ -6,6 +6,7 @@ from .models import Address
 from .models import Supplier
 from .models import Product
 from .models import Order, OrderItem
+from .models import Cart, CartItem
 
 # Register your models here.
 
@@ -123,3 +124,23 @@ class ProductAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
+    
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'created_at')
+    search_fields = ('user__username',)
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+class CartItemInline(admin.TabularInline):
+    model = CartItem
+    extra = 1

@@ -3,7 +3,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from artelie.views import (
     BrandViewSet, CategoryViewSet, UserViewSet, AddressViewSet,
-    SupplierViewSet, ProfileView, ProductViewSet, OrderViewSet
+    SupplierViewSet, ProfileView, ProductViewSet, OrderViewSet,
+    CartViewSet, CartItemViewSet
 )
 from artelie.views.register import RegisterView
 from rest_framework_simplejwt.views import (
@@ -20,6 +21,8 @@ router.register(r'addresses', AddressViewSet, basename='address')
 router.register(r'suppliers', SupplierViewSet, basename='supplier')
 router.register(r'products', ProductViewSet, basename='product')
 router.register(r'orders', OrderViewSet, basename='order')
+router.register(r'carts', CartViewSet, basename='cart')
+router.register(r'cart-items', CartItemViewSet, basename='cartitem')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
