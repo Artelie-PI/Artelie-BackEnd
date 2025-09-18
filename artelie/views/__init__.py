@@ -8,3 +8,4 @@ from .supplier import SupplierViewSet
 from .product import ProductViewSet
 from .order import OrderViewSet
 from .cart import CartViewSet, CartItemViewSet
+from .review import ReviewViewSet
