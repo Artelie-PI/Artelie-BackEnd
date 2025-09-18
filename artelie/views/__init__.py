@@ -5,3 +5,5 @@ from .profile import ProfileView
 from .register import RegisterView
 from .address import AddressViewSet
 from .supplier import SupplierViewSet
+from .product import ProductViewSet
+from .order import OrderViewSet
