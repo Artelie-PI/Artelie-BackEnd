@@ -1,12 +1,10 @@
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from artelie.views import BrandViewSet
-from artelie.views import CategoryViewSet
-from artelie.views import UserViewSet
-from artelie.views import AddressViewSet
-from artelie.views import SupplierViewSet
-from artelie.views import ProfileView
+from artelie.views import (
+    BrandViewSet, CategoryViewSet, UserViewSet, AddressViewSet,
+    SupplierViewSet, ProfileView, ProductViewSet, OrderViewSet
+)
 from artelie.views.register import RegisterView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
@@ -20,6 +18,8 @@ router.register(r'categories', CategoryViewSet, basename='category')
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'addresses', AddressViewSet, basename='address')
 router.register(r'suppliers', SupplierViewSet, basename='supplier')
+router.register(r'products', ProductViewSet, basename='product')
+router.register(r'orders', OrderViewSet, basename='order')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
