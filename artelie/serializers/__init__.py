@@ -7,3 +7,4 @@ from .supplier import SupplierSerializer
 from .product import ProductSerializer
 from .order import OrderSerializer
 from .cart import CartSerializer, CartItemSerializer
+from .review import ReviewSerializer
