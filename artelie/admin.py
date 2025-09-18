@@ -7,6 +7,7 @@ from .models import Supplier
 from .models import Product
 from .models import Order, OrderItem
 from .models import Cart, CartItem
+from .models import Review
 
 # Register your models here.
 
@@ -144,3 +145,19 @@ class CartAdmin(admin.ModelAdmin):
 class CartItemInline(admin.TabularInline):
     model = CartItem
     extra = 1
+
+@admin.register(Review)
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = ('product', 'user', 'rating', 'created_at')
+    search_fields = ('product__name', 'user__username', 'rating')
+    ordering = ('-created_at',)
+    readonly_fields = ('created_at',)
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
