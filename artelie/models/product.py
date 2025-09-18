@@ -6,9 +6,9 @@ class Product(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField()
-    categories = models.ManyToManyField(Category, related_name='products')
-    brand = models.ForeignKey(Brand, on_delete=models.PROTECT, related_name='products')
-    supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT, related_name='products')
+    categories = models.ForeignKey(Category, on_delete=models.PROTECT)
+    brand = models.ForeignKey(Brand, on_delete=models.PROTECT)
+    supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -19,6 +19,6 @@ class Product(models.Model):
         ordering = ['name']
         indexes = [
             models.Index(fields=['name']),
-            models.Index(fields=['category']),
+            models.Index(fields=['categories']),
             models.Index(fields=['brand']),
         ]
