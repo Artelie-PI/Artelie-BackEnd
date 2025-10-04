@@ -15,7 +15,7 @@ from rest_framework_simplejwt.views import (
 router = DefaultRouter()
 
 router.register(r'brands', BrandViewSet, basename='brand')
-router.register(r'categories', CategoryViewSet, basename='category')
+router.register(r'category', CategoryViewSet, basename='category')
 router.register(r'users', UserViewSet, basename='user')
 router.register(r'addresses', AddressViewSet, basename='address')
 router.register(r'suppliers', SupplierViewSet, basename='supplier')
