@@ -55,7 +55,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     Utiliza email como campo de autenticação principal.
     """
 
-    #validador para username (só letras, número e underscore)
+    #validador para username (só letras, número e undeline)
     username_validator = RegexValidator(
         regex=r'^[a-zA-Z0-9_]+$',
         message='Username só pode conter letras, números e underlines (_).'
