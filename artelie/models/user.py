@@ -62,7 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
 
     #campos básicos de usuário
-    id = models.UUIDField(primary_key=True, default==uuid.uuid4, editable=False, help_text='Identificador único do usuário. (UUID)')
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, help_text='Identificador único do usuário. (UUID)')
     username = models.CharField(max_length=50, unique=True, validators=[username_validator], help_text="Nome de usuário único. (3-50 caracteres)")
     email = models.EmailField(max_length=254, unique=True, help_text="Endereço de email único do usuário.")
     full_name = models.CharField(max_length=150, blank=True, help_text="Nome completo do usuário.")
