@@ -171,6 +171,3 @@ class UserUpdateSerializer(BaseUserSerializer):
         if not attrs:
             raise serializers.ValidationError("Nenhum dado fornecido para atualização.")
         return attrs
-
-
-        
