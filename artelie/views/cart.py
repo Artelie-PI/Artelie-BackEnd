@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from artelie.models.cart import Cart, CartItem
 from artelie.serializers.cart import CartSerializer, CartItemSerializer

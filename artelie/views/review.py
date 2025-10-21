@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions
+from rest_framework.permissions import IsAuthenticated
 from artelie.models.review import Review
 from artelie.serializers.review import ReviewSerializer
 

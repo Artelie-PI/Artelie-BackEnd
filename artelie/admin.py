@@ -111,8 +111,8 @@ class SupplierAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'categories', 'brand', 'supplier', 'price', 'stock', 'created_at', 'updated_at')
-    search_fields = ('name', 'categories__name', 'brand__name', 'supplier__name')
+    list_display = ('name', 'category', 'brand', 'supplier', 'price', 'stock', 'created_at', 'updated_at')
+    search_fields = ('name', 'category__name', 'brand__name', 'supplier__name')
     ordering = ('-created_at',)
     readonly_fields = ('created_at', 'updated_at')
 

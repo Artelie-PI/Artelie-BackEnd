@@ -1,25 +1,173 @@
 from rest_framework import serializers
-from artelie.models import User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
+import re
 
-class UserSerializer(serializers.ModelSerializer):
+User = get_user_model()
+
+class BaseUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer base com validações comuns."""
+
+    def validate_email(self, value):
+        """ Validação do email. """
+        value = value.lower().strip()
+
+        #verifica se o email existe e o usuario tbm
+
+        queryset = User.objects.filter(email=value)
+        if self.isinstance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise serializers.ValidationError("Este email já está em uso.")
+        
+        return value
+    
+    def validate_username(self, value):
+        """Validação do username."""
+
+        value = value.lower().strip()
+
+        if len(value) < 3:
+            raise serializers.ValidationError("O nome de usuário deve ter pelo menos 3 digitos")
+        
+        if not re.match(r'^[a-zA-Z0-9_]+$', value):
+            raise serializers.ValidationError("O nome de usuário só pode conter letras, números, pontos, underline e hífens.")
+        
+        #verifica se o username existe (menos o proprio usuario na edicao)
+        queryset = User.objects.filter(username=value)
+        if self.instance:
+            queryset = queryset.exclude(pk=self.instance.pk)
+
+        if queryset.exists():
+            raise serializers.ValidationError("Este nome de usuário já está em uso.")
+        
+        return value
+    
+class UserSerializer(BaseUserSerializer):
+    """
+    Serializer para CRUD e usado pelo adm"""
+
+    full_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
+
+    class Meta:
+        fields = [
+            'id', 'username', 'email', 'full_name', 
+            'is_active', 'is_verified', 'is_staff',
+            'created_at', 'updated_at', 'last_login'
+        ]
+        read_only_fields = [
+            'id', 'created_at', 'updated_at', 'last_login',
+            'is_verified' #alterado só internamente
+        ]
+
+        extra_kwargs = {
+            'email': {'required': True, 'allow_blank': False},
+            'username': {'required': True, 'allow_blank': False},
+        }
+
+    def to_representation(self, instance):
+        """Representação personalizada do usuário."""
+        data = super().to_representation(instance)
+        request = self.context.get('request')
+
+        #esconde campos sensiveis se não for staff
+
+        if(request and not request.user.is_staff and request.user != instance):
+            sensitive_fields = ['is_active', 'is_staff', 'last_login']
+            for field in sensitive_fields:
+                data.pop(field,None)
+
+        return data
+    
+class UserDetailSerializer(BaseUserSerializer):
+    """ detalha informacoes individuais e infos adcionais """
+
+    address = serializers.SerializerMethodField()
+    full_name = serializers.SerializerMethodField()
+
+    class Meta(UserSerializer.Meta):
+        fields = UserSerializer.Meta.fields + [
+            'address', 'full_name_display'
+        ]
+    
+    def get_address(self, obj):
+        """retorna o endereco se existir"""
+        if obj.address:
+            from artelie.serializers.address import AddressSerializer
+            return AddressSerializer(obj.address).data
+        return None
+    
+    def get_full_name_display(self, obj):
+        """retorna o nome formatado"""
+        return obj.get_full_name()
+
+class UserCreateSerializer(BaseUserSerializer):
+    """ criacao de user por adm""" 
+    password = serializers.CharField(min_length=8, write_only=True, required=True, style={'input_type': 'password'}, help_text="Senha do usuário. Deve ter pelo menos 8 caracteres.")
+    password_confirm = serializers.CharField(min_length=8, write_only=True, required=True, style={'input_type': 'password'}, help_text="Confirmação da senha.")
+
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'full_name', 'created_at', 'is_active', 'is_staff']
-        read_only_fields = ['id', 'created_at']
-        extra_kwargs = {
-            'username': {'required': True, 'max_length': 50},
-            'email': {'required': True, 'max_length': 120, 'allow_blank': False},
-            'full_name': {'required': False, 'max_length': 100, 'allow_blank': True},
-        }
-        validators = [
-            serializers.UniqueTogetherValidator(
-                queryset=User.objects.all(),
-                fields=['username'],
-                message="A user with this username already exists."
-            ),
-            serializers.UniqueTogetherValidator(
-                queryset=User.objects.all(),
-                fields=['email'],
-                message="A user with this email already exists."
-            )
+        fields = [
+            'username', 'email', 'full_name', 
+            'password', 'password_confirm',
+            'is_active', 'is_staff'
         ]
+        extra_kwargs = {
+            'email': {'required': True},
+            'username': {'required': True},
+            'full_name': {'required': False},
+        }
+
+    def validate_password(self, value):
+        """ Validação da senha usando validadores do Django. """
+        try:
+            validate_password(value)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value
+    
+    def validate(self, attrs):
+        """ Validacao cross-field. """
+        password = attrs.get('password')
+        password_confirm = attrs.get('password_confirm')
+
+        if password != password_confirm:
+            raise serializers.ValidationError({'password_confirm': "As senhas não estão iguais."})
+        
+        return attrs
+    
+    def create(self, validated_data):
+        """cria user"""
+
+        validated_data.pop('password_confirm', None)
+        password = validated_data.pop('password')
+
+        user = User.objects.create_user(password=password, **validated_data)
+        user.set_password(password)
+        user.save()
+
+        return user
+    
+
+class UserUpdateSerializer(BaseUserSerializer):
+
+    class Meta:
+        model = User
+        fields = [
+            'username', 'email', 'full_name'
+        ]
+        extra_kwargs = {
+            'email': {'required': False},
+            'username': {'required': False},
+            'full_name': {'required': False},
+        }
+
+    def validate(self, attrs):
+        """ validacao para evitar alteracao desnecessaria """
+        if not attrs:
+            raise serializers.ValidationError("Nenhum dado fornecido para atualização.")
+        return attrs
