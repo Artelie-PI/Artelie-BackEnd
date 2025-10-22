@@ -49,6 +49,12 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 # em settings.py
 
 
+#media settings
+MEDIA_URL = "http://localhost:8000/media/"
+MEDIA_ENDPOINT = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+FILE_UPLOAD_PERMISSIONS = 0o640
+
 
 INSTALLED_APPS = [
     # Django default apps
@@ -65,11 +71,14 @@ INSTALLED_APPS = [
     'django_extensions',
     "rest_framework_simplejwt",
     "corsheaders",
-     'django_filters',
+    'django_filters',
+    'cloudinary_storage',
+    'cloudinary',
     
 
     # Local apps
     'artelie',
+    "uploader",
 ]
 
 REST_FRAMEWORK = {
@@ -231,6 +240,16 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+if MODE in ["PRODUCTION", "MIGRATE"]:
+    CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    STATIC_ROOT = os.path.join(BASE_DIR, "static")
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    MEDIA_URL = '/media/'
+else:
+    MY_IP = os.getenv("MY_IP", "127.0.0.1")
+    MEDIA_URL = f"http://{MY_IP}:19003/media/"
 
 
 # Default primary key field type
