@@ -171,3 +171,78 @@ class UserUpdateSerializer(BaseUserSerializer):
         if not attrs:
             raise serializers.ValidationError("Nenhum dado fornecido para atualização.")
         return attrs
+class UserPasswordChangeSerializer(serializers.Serializer):
+    """
+    Serializer para troca de senha de usuários autenticados.
+    """
+    old_password = serializers.CharField(
+        write_only=True,
+        style={'input_type': 'password'},
+        help_text="Senha atual do usuário."
+    )
+    new_password = serializers.CharField(
+        write_only=True,
+        min_length=8,
+        style={'input_type': 'password'},
+        help_text="Nova senha (mínimo 8 caracteres)."
+    )
+    new_password_confirm = serializers.CharField(
+        write_only=True,
+        style={'input_type': 'password'},
+        help_text="Confirmação da nova senha."
+    )
+    
+    def validate_old_password(self, value):
+        """Verifica se a senha atual está correta."""
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Senha atual incorreta.")
+        return value
+    
+    def validate_new_password(self, value):
+        """Validação da nova senha."""
+        try:
+            validate_password(value, user=self.context['request'].user)
+        except DjangoValidationError as e:
+            raise serializers.ValidationError(list(e.messages))
+        return value
+    
+    def validate(self, attrs):
+        """Validação cross-field."""
+        new_password = attrs.get('new_password')
+        new_password_confirm = attrs.get('new_password_confirm')
+        old_password = attrs.get('old_password')
+        
+        if new_password != new_password_confirm:
+            raise serializers.ValidationError({
+                'new_password_confirm': 'As senhas não coincidem.'
+            })
+        
+        if old_password == new_password:
+            raise serializers.ValidationError({
+                'new_password': 'A nova senha deve ser diferente da atual.'
+            })
+        
+        return attrs
+    
+    def save(self):
+        """Atualiza a senha do usuário."""
+        user = self.context['request'].user
+        user.set_password(self.validated_data['new_password'])
+        user.save(update_fields=['password'])
+        return user
+
+
+class PublicUserSerializer(serializers.ModelSerializer):
+    """
+    Serializer para informações públicas do usuário.
+    Usado em contextos onde informações sensíveis devem ser ocultadas.
+    """
+    full_name_display = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'full_name_display']
+    
+    def get_full_name_display(self, obj):
+        return obj.get_full_name()

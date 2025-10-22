@@ -5,7 +5,7 @@
 groups = ["default"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:7aa672fbd04c8289d81e53320abe5c87e51fea183706ad071f731dcb775ac6f3"
+content_hash = "sha256:f01364f2a4fc50ff522269012e5f5cc00fd381e2ee4d9bb975dc4eda50331ce0"
 
 [[metadata.targets]]
 requires_python = ">=3.12"
@@ -107,6 +107,20 @@ dependencies = [
 files = [
     {file = "django_extensions-4.1-py3-none-any.whl", hash = "sha256:0699a7af28f2523bf8db309a80278519362cd4b6e1fd0a8cd4bf063e1e023336"},
     {file = "django_extensions-4.1.tar.gz", hash = "sha256:7b70a4d28e9b840f44694e3f7feb54f55d495f8b3fa6c5c0e5e12bcb2aa3cdeb"},
+]
+
+[[package]]
+name = "django-filter"
+version = "25.2"
+requires_python = ">=3.10"
+summary = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
+groups = ["default"]
+dependencies = [
+    "Django>=5.2",
+]
+files = [
+    {file = "django_filter-25.2-py3-none-any.whl", hash = "sha256:9c0f8609057309bba611062fe1b720b4a873652541192d232dd28970383633e3"},
+    {file = "django_filter-25.2.tar.gz", hash = "sha256:760e984a931f4468d096f5541787efb8998c61217b73006163bf2f9523fe8f23"},
 ]
 
 [[package]]
