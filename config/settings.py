@@ -74,11 +74,11 @@ INSTALLED_APPS = [
     'django_filters',
     'cloudinary_storage',
     'cloudinary',
+    'pyuploadcare.dj',
     
 
     # Local apps
     'artelie',
-    "uploader",
 ]
 
 REST_FRAMEWORK = {
@@ -140,6 +140,30 @@ TEMPLATES = [
         },
     },
 ]
+
+UPLOADCARE = {
+    'pub_key': os.getenv('UPLOADCARE_PUBLIC_KEY'),
+    'secret': os.getenv('UPLOADCARE_SECRET_KEY'),
+    
+    # CDN e URLs
+    'cdn_base': None,  # URL customizada do CDN
+    'upload_base_url': None,  # URL customizada do upload
+    
+    # Segurança
+    'signed_uploads': False,  # Ativar uploads assinados
+    
+    # Widget (para usar no Django Admin ou forms)
+    'use_hosted_assets': True,  # Usar assets hospedados no CDN
+    'widget': {
+        'version': '1',
+        'variant': 'regular',  # regular, inline, minimal
+        'build': 'min',
+        'options': {
+            'source-list': 'local,url,camera',  # Fontes de upload
+            'camera-mirror': True,
+        },
+    },
+}
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
