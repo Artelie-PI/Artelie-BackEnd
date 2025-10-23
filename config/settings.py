@@ -49,11 +49,7 @@ LOG_DIR.mkdir(parents=True, exist_ok=True)
 # em settings.py
 
 
-#media settings
-MEDIA_URL = "http://localhost:8000/media/"
-MEDIA_ENDPOINT = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
-FILE_UPLOAD_PERMISSIONS = 0o640
+
 
 
 INSTALLED_APPS = [
@@ -73,12 +69,11 @@ INSTALLED_APPS = [
     "corsheaders",
     'django_filters',
     'cloudinary_storage',
-    'cloudinary',
-    'pyuploadcare.dj',
-    
+    'cloudinary', 
 
     # Local apps
     'artelie',
+    'uploader',
 ]
 
 REST_FRAMEWORK = {
@@ -141,30 +136,6 @@ TEMPLATES = [
     },
 ]
 
-UPLOADCARE = {
-    'pub_key': os.getenv('UPLOADCARE_PUBLIC_KEY'),
-    'secret': os.getenv('UPLOADCARE_SECRET_KEY'),
-    
-    # CDN e URLs
-    'cdn_base': None,  # URL customizada do CDN
-    'upload_base_url': None,  # URL customizada do upload
-    
-    # Segurança
-    'signed_uploads': False,  # Ativar uploads assinados
-    
-    # Widget (para usar no Django Admin ou forms)
-    'use_hosted_assets': True,  # Usar assets hospedados no CDN
-    'widget': {
-        'version': '1',
-        'variant': 'regular',  # regular, inline, minimal
-        'build': 'min',
-        'options': {
-            'source-list': 'local,url,camera',  # Fontes de upload
-            'camera-mirror': True,
-        },
-    },
-}
-
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
@@ -178,6 +149,12 @@ DATABASES = {
         conn_health_checks=True,
     )
 }
+SIMPLE_JWT = {
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+}
+
 
 
 # Password validation
@@ -259,12 +236,15 @@ USE_I18N = True
 USE_TZ = True
 
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+
+#media settings
 if MODE in ["PRODUCTION", "MIGRATE"]:
     CLOUDINARY_URL = os.getenv("CLOUDINARY_URL")
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
@@ -275,6 +255,10 @@ else:
     MY_IP = os.getenv("MY_IP", "127.0.0.1")
     MEDIA_URL = f"http://{MY_IP}:19003/media/"
 
+
+MEDIA_ENDPOINT = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media/")
+FILE_UPLOAD_PERMISSIONS = 0o640
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

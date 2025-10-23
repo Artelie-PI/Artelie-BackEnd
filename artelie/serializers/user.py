@@ -6,20 +6,19 @@ import re
 
 User = get_user_model()
 
+
 class BaseUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer base com validações comuns."""
-
+    """Serializer base com validações comuns."""
+    
     def validate_email(self, value):
-        """ Validação do email. """
+        """Validação do email."""
         value = value.lower().strip()
-
-        #verifica se o email existe e o usuario tbm
-
+        
+        # Verifica se o email existe (menos o próprio usuário na edição)
         queryset = User.objects.filter(email=value)
-        if self.isinstance:
+        if self.instance:  # ✅ CORRIGIDO (era self.isinstance)
             queryset = queryset.exclude(pk=self.instance.pk)
-
+        
         if queryset.exists():
             raise serializers.ValidationError("Este email já está em uso.")
         
@@ -27,32 +26,33 @@ class BaseUserSerializer(serializers.ModelSerializer):
     
     def validate_username(self, value):
         """Validação do username."""
-
         value = value.lower().strip()
-
+        
         if len(value) < 3:
-            raise serializers.ValidationError("O nome de usuário deve ter pelo menos 3 digitos")
+            raise serializers.ValidationError("O nome de usuário deve ter pelo menos 3 caracteres")
         
         if not re.match(r'^[a-zA-Z0-9_]+$', value):
-            raise serializers.ValidationError("O nome de usuário só pode conter letras, números, pontos, underline e hífens.")
+            raise serializers.ValidationError(
+                "O nome de usuário só pode conter letras, números e underline."
+            )
         
-        #verifica se o username existe (menos o proprio usuario na edicao)
+        # Verifica se o username existe (menos o próprio usuário na edição)
         queryset = User.objects.filter(username=value)
         if self.instance:
             queryset = queryset.exclude(pk=self.instance.pk)
-
+        
         if queryset.exists():
             raise serializers.ValidationError("Este nome de usuário já está em uso.")
         
         return value
-    
+
+
 class UserSerializer(BaseUserSerializer):
-    """
-    Serializer para CRUD e usado pelo adm"""
-
+    """Serializer para CRUD e usado pelo adm"""
     full_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
-
+    
     class Meta:
+        model = User  # ✅ ADICIONADO
         fields = [
             'id', 'username', 'email', 'full_name', 
             'is_active', 'is_verified', 'is_staff',
@@ -60,55 +60,64 @@ class UserSerializer(BaseUserSerializer):
         ]
         read_only_fields = [
             'id', 'created_at', 'updated_at', 'last_login',
-            'is_verified' #alterado só internamente
+            'is_verified'
         ]
-
         extra_kwargs = {
             'email': {'required': True, 'allow_blank': False},
             'username': {'required': True, 'allow_blank': False},
         }
-
+    
     def to_representation(self, instance):
         """Representação personalizada do usuário."""
         data = super().to_representation(instance)
         request = self.context.get('request')
-
-        #esconde campos sensiveis se não for staff
-
-        if(request and not request.user.is_staff and request.user != instance):
+        
+        # Esconde campos sensíveis se não for staff
+        if (request and not request.user.is_staff and request.user != instance):
             sensitive_fields = ['is_active', 'is_staff', 'last_login']
             for field in sensitive_fields:
-                data.pop(field,None)
-
+                data.pop(field, None)
+        
         return data
-    
-class UserDetailSerializer(BaseUserSerializer):
-    """ detalha informacoes individuais e infos adcionais """
 
+
+class UserDetailSerializer(UserSerializer):  # ✅ CORRIGIDO: herda de UserSerializer
+    """Detalha informações individuais e infos adicionais"""
     address = serializers.SerializerMethodField()
-    full_name = serializers.SerializerMethodField()
-
+    full_name_display = serializers.SerializerMethodField()
+    
     class Meta(UserSerializer.Meta):
-        fields = UserSerializer.Meta.fields + [
-            'address', 'full_name_display'
-        ]
+        fields = UserSerializer.Meta.fields + ['address', 'full_name_display']
     
     def get_address(self, obj):
-        """retorna o endereco se existir"""
+        """Retorna o endereço se existir"""
         if obj.address:
             from artelie.serializers.address import AddressSerializer
             return AddressSerializer(obj.address).data
         return None
     
     def get_full_name_display(self, obj):
-        """retorna o nome formatado"""
+        """Retorna o nome formatado"""
         return obj.get_full_name()
 
-class UserCreateSerializer(BaseUserSerializer):
-    """ criacao de user por adm""" 
-    password = serializers.CharField(min_length=8, write_only=True, required=True, style={'input_type': 'password'}, help_text="Senha do usuário. Deve ter pelo menos 8 caracteres.")
-    password_confirm = serializers.CharField(min_length=8, write_only=True, required=True, style={'input_type': 'password'}, help_text="Confirmação da senha.")
 
+class UserCreateSerializer(BaseUserSerializer):
+    """Criação de user por adm"""
+    password = serializers.CharField(
+        min_length=8, 
+        write_only=True, 
+        required=True, 
+        style={'input_type': 'password'}, 
+        help_text="Senha do usuário. Deve ter pelo menos 8 caracteres."
+    )
+    password_confirm = serializers.CharField(
+        min_length=8, 
+        write_only=True, 
+        required=True, 
+        style={'input_type': 'password'}, 
+        help_text="Confirmação da senha."
+    )
+    
     class Meta:
         model = User
         fields = [
@@ -121,9 +130,9 @@ class UserCreateSerializer(BaseUserSerializer):
             'username': {'required': True},
             'full_name': {'required': False},
         }
-
+    
     def validate_password(self, value):
-        """ Validação da senha usando validadores do Django. """
+        """Validação da senha usando validadores do Django."""
         try:
             validate_password(value)
         except DjangoValidationError as e:
@@ -131,50 +140,50 @@ class UserCreateSerializer(BaseUserSerializer):
         return value
     
     def validate(self, attrs):
-        """ Validacao cross-field. """
+        """Validação cross-field."""
         password = attrs.get('password')
         password_confirm = attrs.get('password_confirm')
-
+        
         if password != password_confirm:
-            raise serializers.ValidationError({'password_confirm': "As senhas não estão iguais."})
+            raise serializers.ValidationError({
+                'password_confirm': "As senhas não estão iguais."
+            })
         
         return attrs
     
     def create(self, validated_data):
-        """cria user"""
-
+        """Cria user"""
         validated_data.pop('password_confirm', None)
         password = validated_data.pop('password')
-
+        
         user = User.objects.create_user(password=password, **validated_data)
         user.set_password(password)
         user.save()
-
+        
         return user
-    
+
 
 class UserUpdateSerializer(BaseUserSerializer):
-
+    """Serializer para atualização de usuário"""
+    
     class Meta:
         model = User
-        fields = [
-            'username', 'email', 'full_name'
-        ]
+        fields = ['username', 'email', 'full_name']
         extra_kwargs = {
             'email': {'required': False},
             'username': {'required': False},
             'full_name': {'required': False},
         }
-
+    
     def validate(self, attrs):
-        """ validacao para evitar alteracao desnecessaria """
+        """Validação para evitar alteração desnecessária"""
         if not attrs:
             raise serializers.ValidationError("Nenhum dado fornecido para atualização.")
         return attrs
+
+
 class UserPasswordChangeSerializer(serializers.Serializer):
-    """
-    Serializer para troca de senha de usuários autenticados.
-    """
+    """Serializer para troca de senha de usuários autenticados."""
     old_password = serializers.CharField(
         write_only=True,
         style={'input_type': 'password'},
@@ -234,10 +243,7 @@ class UserPasswordChangeSerializer(serializers.Serializer):
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
-    """
-    Serializer para informações públicas do usuário.
-    Usado em contextos onde informações sensíveis devem ser ocultadas.
-    """
+    """Serializer para informações públicas do usuário."""
     full_name_display = serializers.SerializerMethodField()
     
     class Meta:

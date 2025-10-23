@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
+from uploader.router import router as uploader_router
 from rest_framework.routers import DefaultRouter
 from artelie.views import (
     BrandViewSet, CategoryViewSet, UserViewSet, AddressViewSet,
@@ -28,6 +29,7 @@ router.register(r'carts', CartViewSet, basename='cart')
 router.register(r'cart-items', CartItemViewSet, basename='cartitem')
 router.register(r'reviews', ReviewViewSet, basename='review')
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
@@ -38,6 +40,7 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('api/verify-email/<str:token>/', EmailVerificationView.as_view(), name='verify-email'),
     path('api/resend-verification/', ResendVerificationEmailView.as_view(), name='resend-verification'),
+    path("api/media/", include(uploader_router.urls)),
 ]
 
 

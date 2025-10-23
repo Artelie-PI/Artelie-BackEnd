@@ -37,7 +37,8 @@ pyjwt==2.10.1
 pyparsing==3.2.5
 python-dateutil==2.9.0.post0
 python-dotenv==1.1.1
-python-magic==0.4.27
+python-magic==0.4.27; sys_platform == "linux"
+python-magic-bin==0.4.14; sys_platform == "win32, darwin"
 pytz==2023.4
 pyuploadcare[django]==6.1.0
 requests==2.32.5
