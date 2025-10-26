@@ -135,13 +135,29 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# ...existing code...
+# determine conn_max_age once based on MODE
+_conn_max_age = 180 if globals().get('MODE') == 'PRODUCTION' else 200
+
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///db.sqlite3',
-        conn_max_age=600,
+        conn_max_age=_conn_max_age,
         conn_health_checks=True,
     )
 }
+
+# safety: ensure dict exists
+_default_db = DATABASES.get('default', {})
+
+host = (_default_db.get('HOST') or '').lower()
+if 'pooler.supabase.com' in host:
+    _default_db['DISABLE_SERVER_SIDE_CURSORS'] = True
+
+# reassign to ensure change is reflected
+DATABASES['default'] = _default_db
+# ...existing code...
+
 SIMPLE_JWT = {
     'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
     'USER_ID_FIELD': 'id',

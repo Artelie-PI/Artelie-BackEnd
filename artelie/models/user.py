@@ -5,6 +5,7 @@ from django.utils import timezone
 from datetime import timedelta
 import uuid
 from .address import Address
+from uploader.models import Image
 
 class UserManager(BaseUserManager):
     """
@@ -86,6 +87,18 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     #relacionamento com endereço
     address = models.OneToOneField(Address, on_delete=models.PROTECT, null=True, blank=True, related_name='user')
+
+    #imagem de perfil
+    profile_image = models.ForeignKey(
+        Image,
+        related_name='+',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        default=None,
+    )
+
+
 
     objects = UserManager()
 

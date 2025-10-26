@@ -2,6 +2,9 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError as DjangoValidationError
+from rest_framework.serializers import ModelSerializer, SlugRelatedField
+from uploader.models import Image
+from uploader.serializers import ImageSerializer
 import re
 
 User = get_user_model()
@@ -14,9 +17,9 @@ class BaseUserSerializer(serializers.ModelSerializer):
         """Validação do email."""
         value = value.lower().strip()
         
-        # Verifica se o email existe (menos o próprio usuário na edição)
+        # verifica se o email existe (menos o próprio usuário na edição)
         queryset = User.objects.filter(email=value)
-        if self.instance:  # ✅ CORRIGIDO (era self.isinstance)
+        if self.instance:
             queryset = queryset.exclude(pk=self.instance.pk)
         
         if queryset.exists():
@@ -50,9 +53,16 @@ class BaseUserSerializer(serializers.ModelSerializer):
 class UserSerializer(BaseUserSerializer):
     """Serializer para CRUD e usado pelo adm"""
     full_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
-    
+    perfil_attachment_key = SlugRelatedField(
+        source='perfil',
+        queryset=Image.objects.all(),
+        slug_field='attachment_key',
+        required=False,
+        write_only=True,
+    )
+    perfil = ImageSerializer(required=False, read_only=True)
     class Meta:
-        model = User  # ✅ ADICIONADO
+        model = User
         fields = [
             'id', 'username', 'email', 'full_name', 
             'is_active', 'is_verified', 'is_staff',
@@ -81,7 +91,7 @@ class UserSerializer(BaseUserSerializer):
         return data
 
 
-class UserDetailSerializer(UserSerializer):  # ✅ CORRIGIDO: herda de UserSerializer
+class UserDetailSerializer(UserSerializer): 
     """Detalha informações individuais e infos adicionais"""
     address = serializers.SerializerMethodField()
     full_name_display = serializers.SerializerMethodField()
