@@ -10,11 +10,9 @@ from artelie.views import (
 )
 from artelie.views.register import RegisterView
 from artelie.views.email_verification import EmailVerificationView, ResendVerificationEmailView
+from rest_framework_simplejwt.views import TokenObtainPairView as EmailTokenObtainPairView
 from django.conf import settings
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework_simplejwt.views import TokenRefreshView 
 
 router = DefaultRouter()
 
@@ -29,12 +27,11 @@ router.register(r'carts', CartViewSet, basename='cart')
 router.register(r'cart-items', CartItemViewSet, basename='cartitem')
 router.register(r'reviews', ReviewViewSet, basename='review')
 
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
     path('', include(router.urls)),
-    path("token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path("token/", EmailTokenObtainPairView.as_view(), name="token_obtain_pair"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("profile/", ProfileView.as_view(), name="user_profile"),
     path('register/', RegisterView.as_view(), name='register'),
@@ -42,7 +39,6 @@ urlpatterns = [
     path('api/resend-verification/', ResendVerificationEmailView.as_view(), name='resend-verification'),
     path("api/media/", include(uploader_router.urls)),
 ]
-
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
