@@ -9,6 +9,8 @@ from django.utils.html import strip_tags
 from django.utils import timezone
 import logging
 import uuid
+import os
+
 
 from artelie.serializers.register import RegisterSerializer
 
@@ -116,39 +118,55 @@ class RegisterView(generics.CreateAPIView):
             # Gerar token de verificação único
             verification_token = str(uuid.uuid4())
             user.verification_token = verification_token
-            user.verification_token_created_at = timezone.now()  # CORRIGIDO: era verification_token_created
-            user.save(update_fields=['verification_token', 'verification_token_created_at'])  # CORRIGIDO
+            user.verification_token_created_at = timezone.now()
+            user.save(update_fields=['verification_token', 'verification_token_created_at'])
             
             # URL de verificação
-            verification_url = request.build_absolute_uri(
-                f'/api/verify-email/{verification_token}/'
-            )
+            frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+            verification_url = f"{frontend_url}/verify-email/{verification_token}"
             
             # Renderizar email HTML
             html_message = f"""
             <html>
-            <body>
-                <h2>Bem-vindo à Artelie, {user.username}!</h2>
-                <p>Obrigado por se cadastrar. Para ativar sua conta, clique no link abaixo:</p>
-                <p><a href="{verification_url}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block;">Ativar minha conta</a></p>
-                <p>Ou copie e cole este link no seu navegador:</p>
-                <p>{verification_url}</p>
-                <p><strong>Este link expira em 24 horas.</strong></p>
-                <p>Se você não se cadastrou, ignore este email.</p>
-                <br>
-                <p>Atenciosamente,<br>Equipe Artelie</p>
+            <body style="font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4;">
+                <div style="max-width: 600px; margin: 0 auto; background-color: white; padding: 30px; border-radius: 10px;">
+                    <h2 style="color: #192EB1;">Bem-vindo à Artelie, {user.username}!</h2>
+                    <p>Obrigado por se cadastrar. Para ativar sua conta, clique no botão abaixo:</p>
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="{verification_url}" style="background-color: #4CAF50; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">Ativar minha conta</a>
+                    </div>
+                    <p>Ou copie e cole este link no seu navegador:</p>
+                    <p style="background-color: #f0f0f0; padding: 10px; border-radius: 5px; word-break: break-all;">{verification_url}</p>
+                    <p><strong>Este link expira em 24 horas.</strong></p>
+                    <p style="color: #666; font-size: 0.9em;">Se você não se cadastrou, ignore este email.</p>
+                    <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;">
+                    <p style="color: #999; font-size: 0.8em;">Atenciosamente,<br>Equipe Artelie</p>
+                </div>
             </body>
             </html>
             """
             
             # Versão texto simples
-            plain_message = strip_tags(html_message)
+            plain_message = f"""
+            Bem-vindo à Artelie, {user.username}!
+            
+            Obrigado por se cadastrar. Para ativar sua conta, acesse o link abaixo:
+            
+            {verification_url}
+            
+            Este link expira em 24 horas.
+            
+            Se você não se cadastrou, ignore este email.
+            
+            Atenciosamente,
+            Equipe Artelie
+            """
             
             # Envio do email
             send_mail(
                 subject='Confirme seu email - Artelie',
                 message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[user.email],
                 html_message=html_message,
                 fail_silently=False,
@@ -156,7 +174,7 @@ class RegisterView(generics.CreateAPIView):
             
             logger.info(
                 f"Email de verificação enviado para: {user.email}",
-                extra={'user_id': str(user.id), 'email': user.email}
+                extra={'user_id': str(user.id), 'email': user.email, 'url': verification_url}
             )
             
             return True
@@ -171,8 +189,8 @@ class RegisterView(generics.CreateAPIView):
                 },
                 exc_info=True
             )
-            # Não fazer raise - usuário foi criado, apenas email falhou
             return False
+
 
     def get_client_ip(self, request):
         """
