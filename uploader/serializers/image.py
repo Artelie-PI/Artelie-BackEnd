@@ -1,8 +1,6 @@
 from rest_framework import serializers
-
 from uploader.helpers.files import CONTENT_TYPE_JPG, CONTENT_TYPE_PNG
 from uploader.models import Image
-
 
 class ImageUploadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,8 +19,8 @@ class ImageUploadSerializer(serializers.ModelSerializer):
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Image
-        fields = ["url", "description", "uploaded_on"]
-        read_only_fields = ["url", "attachment_key", "uploaded_on"]
+        fields = ["attachment_key", "url", "description", "uploaded_on"]
+        read_only_fields = ["attachment_key", "url", "uploaded_on"]
 
     def create(self, validated_data):
         raise NotImplementedError("Use ImageUploadSerializer to create images.")

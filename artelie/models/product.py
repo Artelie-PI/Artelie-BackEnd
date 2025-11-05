@@ -12,7 +12,7 @@ class Product(models.Model):
     supplier = models.ForeignKey(Supplier, on_delete=models.PROTECT)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    Imagem = models.ForeignKey(
+    image = models.ForeignKey(
         Image,
         related_name="+",
         on_delete=models.SET_NULL,
