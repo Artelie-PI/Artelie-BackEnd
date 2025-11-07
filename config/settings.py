@@ -87,8 +87,7 @@ REST_FRAMEWORK = {
         'user_operations': '60/hour',  # 60 operações de usuário por hora
     },
     # Paginação
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    'DEFAULT_PAGINATION_CLASS': 'artelie.pagination.DefaultPagination',
     # Filtros
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
