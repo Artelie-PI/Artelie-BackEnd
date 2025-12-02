@@ -10,9 +10,8 @@ from artelie.views import (
 )
 from artelie.views.register import RegisterView
 from artelie.views.email_verification import EmailVerificationView, ResendVerificationEmailView
-from rest_framework_simplejwt.views import TokenObtainPairView as EmailTokenObtainPairView
 from django.conf import settings
-from rest_framework_simplejwt.views import TokenRefreshView 
+from artelie.auth_views import LoginView, RefreshToken, LogoutView
 
 router = DefaultRouter()
 
@@ -30,14 +29,14 @@ router.register(r'reviews', ReviewViewSet, basename='review')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('', include(router.urls)),
-    path("token/", EmailTokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("profile/", ProfileView.as_view(), name="user_profile"),
-    path('register/', RegisterView.as_view(), name='register'),
+    path('api/token/', LoginView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', RefreshToken.as_view(), name='token_refresh'),
+    path('api/token/logout/', LogoutView.as_view(), name='token_logout'),
+    path('api/profile/', ProfileView.as_view(), name='user_profile'),
+    path('api/register/', RegisterView.as_view(), name='register'),
     path('api/verify-email/<str:token>/', EmailVerificationView.as_view(), name='verify-email'),
     path('api/resend-verification/', ResendVerificationEmailView.as_view(), name='resend-verification'),
-    path("api/media/", include(uploader_router.urls)),
+    path('api/media/', include(uploader_router.urls)),
 ]
 
 if settings.DEBUG:
