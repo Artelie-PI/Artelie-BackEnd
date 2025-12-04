@@ -15,7 +15,12 @@ MODE = os.getenv("MODE", "DEVELOPMENT")
 SECRET_KEY = os.getenv("SECRET_KEY", "replace-me")
 DEBUG = str(os.getenv("DEBUG", "False")).lower() in ("1", "true", "yes")
 
-ALLOWED_HOSTS = [h.strip() for h in os.getenv("ALLOWED_HOSTS", "localhost").split(",") if h.strip()]
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "191.52.56.104",
+    "0.0.0.0",
+]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -37,7 +42,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # deve ficar o mais cedo possível
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -66,6 +71,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = "config.wsgi.application"
+
 _conn_max_age = 180 if MODE == "PRODUCTION" else 200
 DATABASES = {
     "default": dj_database_url.config(
@@ -112,27 +118,29 @@ REST_FRAMEWORK = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator", "OPTIONS": {"min_length": 8},},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 8},
+    },
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-if MODE == "DEVELOPMENT":
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-else:
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_HOST = "smtp.gmail.com"
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "artelieonlineweb@gmail.com")
-    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-    DEFAULT_FROM_EMAIL = os.getenv("EMAIL_HOST_USER", "artelieonlineweb@gmail.com")
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "artelieonlineweb@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {"verbose": {"format": "{levelname} {asctime} {module} {message}", "style": "{"}},
+    "formatters": {
+        "verbose": {"format": "{levelname} {asctime} {module} {message}", "style": "{"}
+    },
     "handlers": {
         "file": {
             "level": "INFO",
@@ -140,26 +148,25 @@ LOGGING = {
             "filename": str(LOG_DIR / "auth.log"),
             "formatter": "verbose",
         },
-        "console": {"level": "INFO", "class": "logging.StreamHandler", "formatter": "verbose"},
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+        },
     },
     "loggers": {
-        "artelie.views.register": {"handlers": ["file", "console"], "level": "INFO", "propagate": False},
-        "artelie.views.user": {"handlers": ["file", "console"], "level": "INFO", "propagate": False},
+        "artelie.views.register": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "artelie.views.user": {
+            "handlers": ["file", "console"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
 }
-
-if MODE == "PRODUCTION":
-    SECURE_SSL_REDIRECT = True
-    SESSION_COOKIE_SECURE = True
-    CSRF_COOKIE_SECURE = True
-    SECURE_BROWSER_XSS_FILTER = True
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-    X_FRAME_OPTIONS = "DENY"
-    CSRF_COOKIE_SAMESITE = "Lax"
-else:
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-    CSRF_COOKIE_SAMESITE = "Lax"
 
 LANGUAGE_CODE = "pt-br"
 TIME_ZONE = "America/Sao_Paulo"
@@ -180,25 +187,43 @@ STORAGES = {
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "artelie.User"
+
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = list(default_headers) + ["content-type", "authorization"]
+
 _raw_cors = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,http://191.52.56.104:5173"
+    "http://localhost:5173,http://127.0.0.1:5173,http://191.52.56.104:5173,http://localhost:3000,http://localhost:8000",
 )
 CORS_ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in _raw_cors.split(",") if o.strip()]
+
 _raw_csrf = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:3000,http://localhost:8000,http://127.0.0.1:5173,http://191.52.56.104:5173"
+    "http://localhost:3000,http://localhost:8000,http://127.0.0.1:5173,http://191.52.56.104:5173",
 )
 CSRF_TRUSTED_ORIGINS = [o.strip().rstrip("/") for o in _raw_csrf.split(",") if o.strip()]
+
 REFRESH_TOKEN_COOKIE_NAME = os.getenv("REFRESH_TOKEN_COOKIE_NAME", "refresh_token")
 REFRESH_TOKEN_COOKIE_PATH = os.getenv("REFRESH_TOKEN_COOKIE_PATH", "/api/token/refresh/")
 REFRESH_TOKEN_COOKIE_HTTPONLY = True
 REFRESH_TOKEN_COOKIE_SAMESITE = os.getenv("REFRESH_TOKEN_COOKIE_SAMESITE", "Lax")
 REFRESH_TOKEN_COOKIE_SECURE = True if MODE == "PRODUCTION" else False
 
-# Static files config
+if MODE == "PRODUCTION":
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+    CSRF_COOKIE_SAMESITE = "Lax"
+else:
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    CSRF_COOKIE_SAMESITE = "Lax"
+
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 print(f"Running in {MODE} mode. Debug is {'on' if DEBUG else 'off'}. Media URL: {MEDIA_URL}")
+print(f"CORS Allowed Origins: {CORS_ALLOWED_ORIGINS}")
+print(f"CSRF Trusted Origins: {CSRF_TRUSTED_ORIGINS}")
