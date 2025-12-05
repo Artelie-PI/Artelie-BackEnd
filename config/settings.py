@@ -15,12 +15,11 @@ MODE = os.getenv("MODE", "DEVELOPMENT")
 SECRET_KEY = os.getenv("SECRET_KEY", "replace-me")
 DEBUG = str(os.getenv("DEBUG", "False")).lower() in ("1", "true", "yes")
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "191.52.56.104",
-    "0.0.0.0",
-]
+_raw_hosts = os.getenv(
+    "ALLOWED_HOSTS",
+    "localhost,127.0.0.1,191.52.56.104,0.0.0.0,artelie-backend.onrender.com,artelieweb.web.app",
+)
+ALLOWED_HOSTS = [h.strip() for h in _raw_hosts.split(",") if h.strip()]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -193,13 +192,13 @@ CORS_ALLOW_HEADERS = list(default_headers) + ["content-type", "authorization"]
 
 _raw_cors = os.getenv(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,http://191.52.56.104:5173,http://localhost:3000,http://localhost:8000",
+    "http://localhost:5173,http://127.0.0.1:5173,http://191.52.56.104:5173,http://localhost:3000,http://localhost:8000,https://artelieweb.web.app",
 )
 CORS_ALLOWED_ORIGINS = [o.strip().rstrip("/") for o in _raw_cors.split(",") if o.strip()]
 
 _raw_csrf = os.getenv(
     "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:3000,http://localhost:8000,http://127.0.0.1:5173,http://191.52.56.104:5173",
+    "http://localhost:3000,http://localhost:8000,http://127.0.0.1:5173,http://191.52.56.104:5173,https://artelieweb.web.app",
 )
 CSRF_TRUSTED_ORIGINS = [o.strip().rstrip("/") for o in _raw_csrf.split(",") if o.strip()]
 
