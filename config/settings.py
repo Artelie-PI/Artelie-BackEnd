@@ -20,6 +20,9 @@ ALLOWED_HOSTS = [
     "127.0.0.1",
     "191.52.56.104",
     "0.0.0.0",
+    "artelie-backend.onrender.com",
+    "artelieweb.web.app",
+    "https://artelie-backend.onrender.com/",
 ]
 
 INSTALLED_APPS = [
